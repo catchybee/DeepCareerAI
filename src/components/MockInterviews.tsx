@@ -255,7 +255,7 @@ export const MockInterviews: React.FC<MockInterviewsProps> = ({
     : 0;
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-page-entry" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
       {/* Header */}
       <div className="page-header">

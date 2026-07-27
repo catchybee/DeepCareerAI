@@ -65,7 +65,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const nextMilestone = roadmapResult?.roadmap.find(step => step.status === 'active');
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-page-entry" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {/* Welcome Banner */}
       <div className="card" style={{ 
         background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(20, 184, 166, 0.05) 100%)',
@@ -76,7 +76,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         padding: '2.5rem 2rem'
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.75rem', fontFamily: 'var(--font-heading)' }}>
+          <h2 className="gradient-text" style={{ fontSize: '1.75rem', fontFamily: 'var(--font-heading)', fontWeight: 800 }}>
             Welcome back, {name || 'Aspiring Professional'}! 👋
           </h2>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '600px' }}>
@@ -220,7 +220,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Circular Indicator Card */}
-          <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: '320px' }}>
+          <div className="card animate-float" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: '320px' }}>
             <h3 style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.15rem' }}>
               <Award size={20} color="var(--secondary)" /> Job Readiness Index
             </h3>

@@ -66,61 +66,136 @@ export interface Internship {
 
 // Local mock service if no API Key is provided
 const generateSimulatedATS = (resumeText: string, jobDesc: string): ATSAnalysisResult => {
-  const score = Math.floor(Math.random() * 25) + 60; // 60 - 85
-  
-  // Extract some potential keywords based on job description or default
   const jdLower = jobDesc.toLowerCase();
   const resumeLower = resumeText.toLowerCase();
   
-  const keywordsList = [
-    'react', 'typescript', 'javascript', 'node.js', 'python', 'sql', 'html', 'css', 
-    'rest api', 'git', 'aws', 'docker', 'machine learning', 'data analysis', 'agile'
+  // Standard list of technical terms to scan for
+  const techKeywords = [
+    'react', 'vue', 'angular', 'svelte', 'typescript', 'javascript', 'html', 'css', 'sass', 'tailwind',
+    'node.js', 'express', 'nest.js', 'golang', 'go', 'python', 'django', 'flask', 'fastapi', 'java', 'spring boot', 'spring',
+    'solidity', 'rust', 'ethereum', 'web3', 'blockchain', 'truffle', 'hardhat', 'foundry',
+    'sql', 'postgres', 'postgresql', 'mysql', 'sqlite', 'mongodb', 'redis', 'elasticsearch', 'cassandra', 'dynamodb',
+    'graphql', 'rest api', 'restful', 'apis', 'grpc', 'websockets',
+    'docker', 'kubernetes', 'aws', 'azure', 'gcp', 'terraform', 'jenkins', 'git', 'github', 'gitlab', 'ci/cd',
+    'pandas', 'numpy', 'scikit-learn', 'tensorflow', 'pytorch', 'keras', 'machine learning', 'data analysis', 'statistics', 'tableau', 'powerbi', 'spark', 'hadoop',
+    'system design', 'microservices', 'caching', 'testing', 'jest', 'mocha', 'cypress', 'forward deployed', 'onboarding', 'integration'
   ];
   
-  const missingKeywords: string[] = [];
-  const matchedKeywords: string[] = [];
+  // Find keywords present in the Job Description
+  const requiredKeywords = techKeywords.filter(kw => jdLower.includes(kw));
   
-  keywordsList.forEach(kw => {
-    if (jdLower.includes(kw)) {
+  const matchedKeywords: string[] = [];
+  const missingKeywords: string[] = [];
+  
+  if (requiredKeywords.length > 0) {
+    requiredKeywords.forEach(kw => {
       if (resumeLower.includes(kw)) {
         matchedKeywords.push(kw.toUpperCase());
       } else {
         missingKeywords.push(kw.toUpperCase());
       }
-    }
-  });
+    });
+  } else {
+    // If JD is empty or has no tech keywords, fall back to default checks
+    const defaultKeywords = ['react', 'javascript', 'html', 'css', 'git'];
+    defaultKeywords.forEach(kw => {
+      if (resumeLower.includes(kw)) {
+        matchedKeywords.push(kw.toUpperCase());
+      } else {
+        missingKeywords.push(kw.toUpperCase());
+      }
+    });
+  }
 
-  if (missingKeywords.length === 0) {
-    missingKeywords.push('SYSTEM DESIGN', 'CI/CD PIPELINES', 'UNIT TESTING');
+  // Calculate matching ratio
+  const totalRequired = requiredKeywords.length > 0 ? requiredKeywords.length : 5;
+  const matchedCount = matchedKeywords.length;
+  const matchRatio = matchedCount / totalRequired;
+  
+  let score = Math.round(30 + matchRatio * 65); // base score of 30, up to 95
+  
+  // Apply penalties for empty or short resumes
+  if (resumeLower.trim().length < 50 || (resumeLower.includes('[extracted from file: ') && resumeText.includes('Skills: React, JavaScript') && resumeText.length < 200 && !jobDesc.toLowerCase().includes('react'))) {
+    // It's a dummy/empty/invalid resume
+    score = Math.floor(Math.random() * 10) + 5; // 5 to 15
+  } else if (resumeLower.trim().length < 150) {
+    score = Math.min(score, 35);
   }
   
+  // Customize findings based on score
+  let strengths: string[] = [];
+  let weaknesses: string[] = [];
+  let formatting: string[] = [];
+  
+  if (score >= 80) {
+    strengths = [
+      `Excellent alignment with job requirements, matching key tools: ${matchedKeywords.slice(0, 4).join(', ')}.`,
+      'Substantial details provided for past technical experiences.',
+      'Highly professional, action-oriented resume format.'
+    ];
+    weaknesses = [
+      missingKeywords.length > 0 
+        ? `Lacks direct mention of: ${missingKeywords.slice(0, 2).join(', ')}.` 
+        : 'Could add more quantitative metrics (e.g. % performance increase) to achievements.',
+      'Consider adding direct links to specific deployed projects.'
+    ];
+    formatting = [
+      'Clean single-column layout, perfectly readable by ATS scanners.',
+      'No complex graphic frames, tables, or shapes that could derail parser algorithms.'
+    ];
+  } else if (score >= 50) {
+    strengths = [
+      matchedKeywords.length > 0 
+        ? `Successfully includes major keywords: ${matchedKeywords.slice(0, 3).join(', ')}.` 
+        : 'Good formatting structure with clear section dividers.',
+      'Clear, readable chronological work history.'
+    ];
+    weaknesses = [
+      `Missing key skills requested in the job description: ${missingKeywords.slice(0, 3).join(', ')}.`,
+      'Bullet points are too descriptive; they need more metric-driven accomplishments.',
+      'Lacks evidence of independent projects using the required tech stack.'
+    ];
+    formatting = [
+      'Document structure is clean, but keep columns simplified to a single-column layout for ATS parser readability.',
+      'Ensure contact details are in standard text, not headers or footers, as some ATS engines ignore them.'
+    ];
+  } else {
+    strengths = [
+      'Standard fonts (Inter, Helvetica) are used, which is good for ATS parsers.',
+      'Basic contact details are easy to identify.'
+    ];
+    weaknesses = [
+      'Severe keyword mismatch. The resume does not address the required job technologies.',
+      'Content is too sparse or lacks descriptive professional bullet points.',
+      missingKeywords.length > 0 
+        ? `Completely missing fundamental requirements: ${missingKeywords.slice(0, 4).join(', ')}.` 
+        : 'No relevant experience or projects are detailed.'
+    ];
+    formatting = [
+      'Alert: Very short document. Ensure your resume is comprehensive (typically 1 full page).',
+      'Avoid placing key skills in tables or graphic shapes, as parsers will skip them.'
+    ];
+  }
+
   return {
     score: score,
     findings: {
-      strengths: [
-        matchedKeywords.length > 0 
-          ? `Good inclusion of key skills: ${matchedKeywords.slice(0, 3).join(', ')}.` 
-          : 'Clean document layout and readable section headings.',
-        'Proper reverse-chronological order of work history.',
-        'Professional tone and active verb usage.'
-      ],
-      weaknesses: [
-        missingKeywords.length > 0
-          ? `Lacks optimization for major keywords found in job description: ${missingKeywords.slice(0, 2).join(', ')}.`
-          : 'Could include more quantifiable metrics for achievements.',
-        'Missing links to professional portfolios or GitHub repositories.'
-      ],
-      formatting: [
-        'Document structure is clean, but keep columns simplified to a single-column layout for ATS parser readability.',
-        'Avoid text inside shapes, boxes, or tables as some ATS parsers ignore these sections.'
-      ]
+      strengths,
+      weaknesses,
+      formatting
     },
-    missingKeywords: missingKeywords.slice(0, 5),
-    actionPlan: [
-      `Integrate missing keywords: ${missingKeywords.slice(0, 3).join(', ')} naturally into your skills or project sections.`,
-      'Rewrite project bullet points using the STAR method (Situation, Task, Action, Result) with quantifiable results.',
-      'Add a dedicated Projects section highlighting real-world applications of your skills.'
-    ]
+    missingKeywords: missingKeywords.slice(0, 6),
+    actionPlan: score < 50 
+      ? [
+          `Tailor your resume directly for this role by learning and adding: ${missingKeywords.slice(0, 3).join(', ')}.`,
+          'Draft clear, detailed project bullets outlining what technologies you used and why.',
+          'Consider rewriting your summary statement to focus on the target job title.'
+        ]
+      : [
+          `Integrate missing keywords: ${missingKeywords.slice(0, 3).join(', ')} naturally into your experience or skills list.`,
+          'Use the STAR method (Situation, Task, Action, Result) to add quantifiable results to each experience bullet.',
+          'Add a dedicated Projects section highlighting real-world applications of your skills.'
+        ]
   };
 };
 

@@ -12,6 +12,65 @@ import {
 } from 'lucide-react';
 import { type ATSAnalysisResult, GeminiService } from '../services/geminiService';
 
+const jobTemplates: Record<string, { title: string, jd: string }> = {
+  "Frontend Developer": {
+    title: "Frontend Developer",
+    jd: `Requirements:
+- 2+ years of experience building modern web applications with React.js, TypeScript, and CSS.
+- Strong knowledge of HTML5, CSS3, ES6+ JavaScript, and responsive design systems.
+- Experience with state management tools (Zustand, Redux, or React Context).
+- Understanding of REST APIs integration, web performance optimization, and version control (Git).`
+  },
+  "Backend Developer": {
+    title: "Backend Developer",
+    jd: `Requirements:
+- 3+ years of experience in backend software development with Node.js, Go, or Python.
+- Proficiency in database schema design, queries, and optimization using PostgreSQL or MongoDB.
+- Experience building secure, scalable REST APIs, GraphQL, and microservice architectures.
+- Experience with containerization (Docker, Kubernetes) and cloud deployments (AWS or GCP).`
+  },
+  "Data Analyst": {
+    title: "Data Analyst",
+    jd: `Requirements:
+- Proficiency in SQL query design, data extraction, and relational database management.
+- Strong skills in data visualization tools (Tableau, PowerBI) to build charts and dashboards.
+- Experience analyzing business metrics and data cleaning using Python (Pandas, NumPy) or R.
+- Ability to synthesize analytical findings and present clear insights to stakeholders.`
+  },
+  "Data Scientist": {
+    title: "Data Scientist",
+    jd: `Requirements:
+- Master's or BS in Statistics, Computer Science, or Mathematics.
+- Experience developing machine learning algorithms (Supervised/Unsupervised) and deep learning models.
+- Mastery of Python (Scikit-Learn, PyTorch, TensorFlow) and Jupyter notebooks.
+- Experience with big data technologies (Spark, Hadoop) and statistical evaluation.`
+  },
+  "Blockchain Developer": {
+    title: "Blockchain Developer",
+    jd: `Requirements:
+- Experience writing secure, optimized smart contracts in Solidity, Rust, or Vyper.
+- Good understanding of EVM networks, consensus mechanisms, cryptography, and Web3 integration.
+- Familiarity with tools like Hardhat, Foundry, and Ether.js.
+- Strong software engineering practices in JavaScript/TypeScript.`
+  },
+  "Java Developer": {
+    title: "Java Developer",
+    jd: `Requirements:
+- Strong core Java (Java 8/11/17) fundamentals, multi-threading, and object-oriented design patterns.
+- Extensive experience with Spring Boot framework, Spring Security, Hibernate, or JPA.
+- Building RESTful microservices and integrating messaging brokers (Kafka, RabbitMQ).
+- Familiarity with CI/CD tools, Maven, Gradle, and relational databases (MySQL, Oracle).`
+  },
+  "Forward Deployed Engineer": {
+    title: "Forward Deployed Engineer",
+    jd: `Requirements:
+- Dynamic software engineer who enjoys coding and customer-facing solution architecture.
+- Full-stack developer proficiency (React, TypeScript, Python, SQL) to build custom features.
+- Experience with technical integration, customer onboarding, and troubleshooting production deployments.
+- Outstanding communication skills to translate complex client requests into system specifications.`
+  }
+};
+
 interface ATSResumeCheckerProps {
   apiKey: string;
   model: string;
@@ -126,7 +185,7 @@ Education: BS in Computer Science (Graduation 2027)`);
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-page-entry" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
       {/* Configuration Header */}
       <div className="page-header">
@@ -252,16 +311,50 @@ Education: BS in Computer Science (Graduation 2027)`);
               </div>
             )}
 
+            {/* Premimum predefined job templates drop-down */}
             <div className="form-group">
-              <label className="form-label">Target Job Title</label>
-              <input 
-                type="text" 
-                className="form-input" 
-                value={targetRole} 
-                onChange={(e) => setTargetRole(e.target.value)} 
-                placeholder="e.g. Frontend Engineer, Data Scientist"
-              />
+              <label className="form-label" style={{ fontWeight: 600 }}>Target Professional Role</label>
+              <select 
+                className="form-select" 
+                value={Object.keys(jobTemplates).includes(targetRole) ? targetRole : (targetRole === "" ? "" : "Custom")}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "Custom") {
+                    setTargetRole("Custom Role");
+                  } else {
+                    setTargetRole(val);
+                    if (jobTemplates[val]) {
+                      setJobDescription(jobTemplates[val].jd);
+                    }
+                  }
+                }}
+                style={{ 
+                  border: '1.5px solid rgba(79, 70, 229, 0.15)',
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.03)',
+                  fontWeight: 500
+                }}
+              >
+                <option value="">-- Choose a target role --</option>
+                {Object.keys(jobTemplates).map(roleKey => (
+                  <option key={roleKey} value={roleKey}>{roleKey}</option>
+                ))}
+                <option value="Custom">Custom Role (Type below)...</option>
+              </select>
             </div>
+
+            {(!Object.keys(jobTemplates).includes(targetRole) || targetRole === "Custom Role") && targetRole !== "" && (
+              <div className="form-group animate-slide-up" style={{ marginTop: '-0.5rem' }}>
+                <label className="form-label">Custom Target Role Name</label>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={targetRole === "Custom Role" ? "" : targetRole} 
+                  onChange={(e) => setTargetRole(e.target.value)} 
+                  placeholder="e.g. Forward Deployed Engineer, DevOps"
+                  style={{ border: '1.5px solid rgba(79, 70, 229, 0.15)' }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="card">

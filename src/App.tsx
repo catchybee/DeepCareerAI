@@ -43,23 +43,28 @@ export default function App({ isConvexActive }: { isConvexActive: boolean }) {
     localStorage.removeItem('deepcareer_session');
   };
 
-  if (isConvexActive) {
-    return (
-      <AppWithConvex 
-        user={user} 
-        onAuthSuccess={handleAuthSuccess} 
-        onLogout={handleLogout} 
-      />
-    );
-  }
-
   return (
-    <AppContent 
-      isConvexActive={false} 
-      user={user} 
-      onAuthSuccess={handleAuthSuccess} 
-      onLogout={handleLogout} 
-    />
+    <>
+      {/* Premium background decorative blobs */}
+      <div className="bg-blob blob-1"></div>
+      <div className="bg-blob blob-2"></div>
+      <div className="bg-blob blob-3"></div>
+
+      {isConvexActive ? (
+        <AppWithConvex 
+          user={user} 
+          onAuthSuccess={handleAuthSuccess} 
+          onLogout={handleLogout} 
+        />
+      ) : (
+        <AppContent 
+          isConvexActive={false} 
+          user={user} 
+          onAuthSuccess={handleAuthSuccess} 
+          onLogout={handleLogout} 
+        />
+      )}
+    </>
   );
 }
 

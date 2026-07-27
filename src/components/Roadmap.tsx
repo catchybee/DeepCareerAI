@@ -23,7 +23,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
 }) => {
   if (!roadmapResult) {
     return (
-      <div className="card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '5rem 2rem', color: 'var(--text-secondary)' }}>
+      <div className="card animate-page-entry" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '5rem 2rem', color: 'var(--text-secondary)' }}>
         <Map size={64} color="var(--card-border)" style={{ marginBottom: '1.5rem' }} />
         <h3 style={{ color: 'white', marginBottom: '0.5rem' }}>No Roadmap Generated</h3>
         <p style={{ fontSize: '0.9rem', maxWidth: '400px' }}>
@@ -78,7 +78,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
   };
 
   return (
-    <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-page-entry" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
       {/* Header */}
       <div className="page-header">
